@@ -8,6 +8,7 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [activeColor, setActiveColor] = useState(null);
   const [flashDuration, setFlashDuration] = useState(600); // Sets the flash duration for colors at 600 ms initially
+  const [countdown, setCountdown] = useState(null);
 
   const colors = [
     // Four basic Simon Says colors, could look for some way to let user change colors themselves, soonTM
@@ -61,10 +62,21 @@ function App() {
   return (
     <>
       <div className="relative w-96 h-96 mx-auto">
+        {/* Countdown display (on top of everything) */}
+        {countdown !== null && (
+          <div className="absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-6xl font-bold pointer-events-none select-none animate-pulse">
+            {countdown}
+          </div>
+        )}
+
         {colors.map((color) => (
+          // Color buttons
           <button
             key={color.id}
-            className={`absolute w-1/2 h-1/2 shadow-gray-100/50 border-4 border-black cursor-pointer transition-all duration-200 
+            className={`absolute z-10 w-1/2 h-1/2 
+              shadow-gray-100/50 inset-shadow-white-100/50
+              border-4 border-black cursor-pointer 
+              transition-all duration-200 
               ${color.colorClass} 
               ${color.positionClass}
               ${activeColor === color.id ? "brightness-125 shadow-2xl" : ""}
@@ -74,12 +86,25 @@ function App() {
             }}
           />
         ))}
+
+        {/* Start button */}
         <button
-          className={`absolute top-1/2 left-1/2 w-24 h-24 bg-gray-800 rounded-full border-4 border-white transform -translate-x-1/2 -translate-y-1/2 cursor-pointer text-white 
-            ${gameStarted ? "invisible" : "visible"}
+          className={`absolute z-10 top-1/2 left-1/2 w-24 h-24 bg-gray-800 rounded-full border-4 border-white transform -translate-x-1/2 -translate-y-1/2 cursor-pointer text-white 
+            ${gameStarted || countdown !== null ? "invisible" : "visible"}
             `}
           onClick={() => {
-            setGameStarted(true);
+            let count = 3;
+            setCountdown(count);
+            const countdownInterval = setInterval(() => {
+              count -= 1;
+              if (count === 0) {
+                clearInterval(countdownInterval);
+                setCountdown(null);
+                setGameStarted(true);
+              } else {
+                setCountdown(count);
+              }
+            }, 1000);
           }}
         >
           Start
