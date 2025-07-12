@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import RestartModal from "./RestartModal";
 
 const colorIds = ["green", "red", "yellow", "blue"];
 const startNumber = 4;
@@ -7,9 +8,10 @@ function App() {
   const [order, setOrder] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [activeColor, setActiveColor] = useState(null);
-  const [flashDuration, setFlashDuration] = useState(600); // Sets the flash duration for colors at 600 ms initially
+  const [flashDuration, setFlashDuration] = useState(600); // Sets the flash duration for colors at 600 ms initially (will update later)
   const [countdown, setCountdown] = useState(null);
   const [playerOrder, setPlayerOrder] = useState([]);
+  const [showRestartModal, setShowRestartModal] = useState(false);
 
   const colors = [
     // Four basic Simon Says colors, could look for some way to let user change colors themselves, soonTM
@@ -84,7 +86,7 @@ function App() {
   return (
     <>
       <div className="relative w-96 h-96 mx-auto">
-        {/* Countdown display (on top of everything) */}
+        {/* Countdown display (on top of everything z-50) */}
         {countdown !== null && (
           <div
             className="absolute z-50 top-1/2 left-1/2 
@@ -137,13 +139,16 @@ function App() {
                 }
               }, 1000);
             } else {
-              console.log("ola");
+              setShowRestartModal(true);
             }
           }}
         >
           {`${gameStarted ? "II" : "Start"}`}
         </button>
       </div>
+      {showRestartModal && (
+        <RestartModal onClose={() => setShowRestartModal(false)} />
+      )}
     </>
   );
 }
