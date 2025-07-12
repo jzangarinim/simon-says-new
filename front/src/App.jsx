@@ -9,6 +9,7 @@ function App() {
   const [activeColor, setActiveColor] = useState(null);
   const [flashDuration, setFlashDuration] = useState(600); // Sets the flash duration for colors at 600 ms initially
   const [countdown, setCountdown] = useState(null);
+  const [playerOrder, setPlayerOrder] = useState([]);
 
   const colors = [
     // Four basic Simon Says colors, could look for some way to let user change colors themselves, soonTM
@@ -35,6 +36,7 @@ function App() {
   ];
 
   useEffect(() => {
+    // Color flashing
     if (order.length === 0) return; // Just in case
     if (!gameStarted) return;
 
@@ -59,12 +61,37 @@ function App() {
     generateInitialOrder();
   }, []);
 
+  useEffect(() => {
+    if (playerOrder.length === 0) return;
+
+    const currentIndex = playerOrder.length - 1;
+    if (playerOrder[currentIndex] !== order[currentIndex]) {
+      // Resets playerOrder on wrong input
+      alert("Wrong sequence! Try again.");
+      setPlayerOrder([]);
+      return;
+    }
+
+    if (playerOrder.length === order.length) {
+      alert("Correct! Get ready for the next round.");
+      // Add new color to sequence and reset playerOrder
+      const newColor = Math.floor(Math.random() * colorIds.length);
+      setOrder((order) => [...order, colorIds[newColor]]);
+      setPlayerOrder([]);
+    }
+  }, [playerOrder]);
+
   return (
     <>
       <div className="relative w-96 h-96 mx-auto">
         {/* Countdown display (on top of everything) */}
         {countdown !== null && (
-          <div className="absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-6xl font-bold pointer-events-none select-none animate-pulse">
+          <div
+            className="absolute z-50 top-1/2 left-1/2 
+              transform -translate-x-1/2 -translate-y-1/2 
+            text-white text-6xl font-bold 
+              pointer-events-none select-none animate-pulse"
+          >
             {countdown}
           </div>
         )}
@@ -82,32 +109,39 @@ function App() {
               ${activeColor === color.id ? "brightness-125 shadow-2xl" : ""}
               `}
             onClick={() => {
-              console.log(`You clicked ${color.id}!`);
+              setPlayerOrder([...playerOrder, color.id]);
             }}
           />
         ))}
 
         {/* Start button */}
         <button
-          className={`absolute z-10 top-1/2 left-1/2 w-24 h-24 bg-gray-800 rounded-full border-4 border-white transform -translate-x-1/2 -translate-y-1/2 cursor-pointer text-white 
-            ${gameStarted || countdown !== null ? "invisible" : "visible"}
-            `}
+          className={`absolute z-10 top-1/2 left-1/2 text-3xl
+              w-24 h-24 rounded-full border-4 
+              transform -translate-x-1/2 -translate-y-1/2
+              bg-gray-800 border-white text-white cursor-pointer
+              ${gameStarted || countdown !== null ? "visible" : "visible"}
+              `}
           onClick={() => {
-            let count = 3;
-            setCountdown(count);
-            const countdownInterval = setInterval(() => {
-              count -= 1;
-              if (count === 0) {
-                clearInterval(countdownInterval);
-                setCountdown(null);
-                setGameStarted(true);
-              } else {
-                setCountdown(count);
-              }
-            }, 1000);
+            if (gameStarted == false) {
+              let count = 3;
+              setCountdown(count);
+              const countdownInterval = setInterval(() => {
+                count -= 1;
+                if (count === 0) {
+                  clearInterval(countdownInterval);
+                  setCountdown(null);
+                  setGameStarted(true);
+                } else {
+                  setCountdown(count);
+                }
+              }, 1000);
+            } else {
+              console.log("ola");
+            }
           }}
         >
-          Start
+          {`${gameStarted ? "II" : "Start"}`}
         </button>
       </div>
     </>
