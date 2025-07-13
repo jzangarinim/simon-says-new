@@ -175,7 +175,7 @@ function App() {
         setShowError(false);
         setAnimateShake(false);
         setPlayerOrder([]);
-      }, 1000);
+      }, 600);
       return;
     }
 
@@ -193,7 +193,7 @@ function App() {
         setPlayerOrder([]);
         setReactionBarWidth(100);
         setReactionScore(0);
-      }, 1500); // 2-second delay between rounds
+      }, 1500); // 1.5-second delay between rounds
     }
   }, [playerOrder]);
 
@@ -208,11 +208,7 @@ function App() {
         reactionBarWidth={reactionBarWidth}
         reactionHighScore={reactionHighScore}
       />
-      <div
-        className={`relative w-96 h-96 mx-auto ${
-          animateShake ? "animate-shake" : ""
-        }`}
-      >
+      <div className={`relative w-96 h-96 mx-auto ${animateShake ? "" : ""}`}>
         {/* Green flash on successful input */}
         {showSuccess && (
           <div className="absolute inset-0 rounded-full bg-green-400/60 z-40 pointer-events-none"></div>
