@@ -1,1 +1,55 @@
 @import "tailwindcss";
+
+/* Button glow */
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6),
+      0 0 0 0 rgba(255, 255, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 24px 4px rgba(255, 255, 255, 0.8),
+      0 0 48px 8px rgba(255, 255, 255, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6),
+      0 0 0 0 rgba(255, 255, 255, 0.4);
+  }
+}
+
+.glow-active {
+  animation: glowPulse 0.9s ease-in-out infinite;
+  filter: brightness(1.15) saturate(1.25);
+}
+
+/* Click ripple*/
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(0);
+  animation: rippleEffect 0.35s linear;
+  pointer-events: none;
+}
+@keyframes rippleEffect {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* FlashLayer transition */
+@keyframes fadeFlash {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: var(--flash-opacity, 0.4);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.flash-enter {
+  --flash-opacity: 0.4;
+  animation: fadeFlash var(--flash-duration, 600ms) forwards;
+}

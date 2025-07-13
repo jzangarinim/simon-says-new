@@ -14,13 +14,13 @@ export default function RestartModal({ onClose, onRestart }) {
 
         <div className="mt-4 flex justify-end space-x-2">
           <button
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
             onClick={onClose}
           >
             Cancel
           </button>
           <button
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 cursor-pointer"
             onClick={onRestart}
           >
             Restart

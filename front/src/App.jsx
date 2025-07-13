@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import RestartModal from "./RestartModal";
-import Scoreboard from "./Scoreboard";
+import RestartModal from "./components/RestartModal";
+import Scoreboard from "./components/Scoreboard";
+import FlashLayer from "./components/FlashLayer";
+import { createRipple } from "./components/Ripple";
 
 const colorIds = ["green", "red", "yellow", "blue"];
 const startNumber = 4;
@@ -72,8 +74,9 @@ function App() {
     setTotalReactionScore(0);
   };
 
+  // Event handling
   const handlePlayerClick = (colorId) => {
-    if (isFlashing) return;
+    if (!gameStarted || isFlashing || countdown !== null || showSuccess) return; // Disable user inputs before game has started or while colors are flashing
 
     // Records player color inputs
     const updatedOrder = [...playerOrder, colorId];
@@ -93,6 +96,8 @@ function App() {
     }
   };
 
+  // Effects
+  // Speed timer useEffect
   useEffect(() => {
     // Reaction timer measure
     if (!isFlashing && gameStarted) {
@@ -114,6 +119,7 @@ function App() {
     }
   }, [isFlashing, gameStarted]);
 
+  // Highscore update useEffect
   useEffect(() => {
     // Highscore update
     if (score > highScore) {
@@ -126,6 +132,7 @@ function App() {
     }
   }, [score]);
 
+  // Color Flashing logic useEffect
   useEffect(() => {
     // Color flashing
     if (order.length === 0) return; // Just in case
@@ -149,6 +156,7 @@ function App() {
     }, totalFlashTime + buffer);
   }, [order, flashDuration, gameStarted]);
 
+  // Initial color order useEffect
   useEffect(() => {
     // Generates an initial random order of colors on mount, saved in newOrder
     const generateInitialOrder = () => {
@@ -162,6 +170,7 @@ function App() {
     generateInitialOrder();
   }, []);
 
+  // Player input comparison vs initial order useEffect
   useEffect(() => {
     if (playerOrder.length === 0) return;
 
@@ -208,17 +217,16 @@ function App() {
         reactionBarWidth={reactionBarWidth}
         reactionHighScore={reactionHighScore}
       />
-      <div className={`relative w-96 h-96 mx-auto ${animateShake ? "" : ""}`}>
-        {/* Green flash on successful input */}
-        {showSuccess && (
-          <div className="absolute inset-0 rounded-full bg-green-400/60 z-40 pointer-events-none"></div>
-        )}
-
-        {/* Red flash on incorrect input */}
-        {showError && (
-          <div className="absolute inset-0 rounded-full bg-red-600/60 z-40 flex items-center justify-center text-4xl text-white font-bold animate-pulse pointer-events-none">
-            Wrong!
-          </div>
+      <div className={`relative w-96 h-96 mx-auto`}>
+        {(showError || showSuccess) && (
+          <FlashLayer
+            color={showError ? "rgba(220,38,38,0.4)" : "rgba(34,197,94,0.4)"}
+            text={showError ? "Wrong!" : undefined}
+            onDone={() => {
+              setShowError(false);
+              setShowSuccess(false);
+            }}
+          />
         )}
 
         {/* Countdown display (on top of everything z-50) */}
@@ -243,10 +251,15 @@ function App() {
               transition-all duration-200 
               ${color.colorClass} 
               ${color.positionClass}
-              ${activeColor === color.id ? "brightness-125 shadow-2xl" : ""}
-              ${isFlashing ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+              ${activeColor === color.id ? "glow-active" : ""}
+              ${
+                isFlashing
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer hover:brightness-110 hover:ring-1 hover:ring-white/40 active:brightness-50 active:scale-98"
+              }
               `}
             disabled={isFlashing}
+            onMouseDown={createRipple}
             onClick={() => handlePlayerClick(color.id)}
           />
         ))}
