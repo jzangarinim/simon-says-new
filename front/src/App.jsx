@@ -29,8 +29,8 @@ function App() {
   const [reactionBarWidth, setReactionBarWidth] = useState(100); // Decreasing reaction bar for user viewing
   const [startTime, setStartTime] = useState(null); //
   const [timerInterval, setTimerInterval] = useState(null);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false); // Shows green layer on correct order input
+  const [showError, setShowError] = useState(false); // Shows red layer on incorrect order input
 
   const colors = [
     // Four basic Simon Says colors, could look for some way to let user change colors themselves, soonTM

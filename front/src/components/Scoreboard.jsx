@@ -30,9 +30,9 @@ export default function Scoreboard({
       <div className="relative h-4 bg-gray-700 rounded-full overflow-hidden">
         <div
           className={`absolute top-0 left-0 h-full bg-green-400 ${
-            reactionBarWidth > 70
+            reactionBarWidth > 60
               ? "bg-green-400"
-              : reactionBarWidth < 33
+              : reactionBarWidth < 20
               ? "bg-red-600"
               : "bg-orange-500"
           } transition-all duration-100`}
