@@ -3,6 +3,7 @@ import RestartModal from "./components/RestartModal";
 import Scoreboard from "./components/Scoreboard";
 import FlashLayer from "./components/FlashLayer";
 import { createRipple } from "./components/Ripple";
+import { playSound } from "./utils/sounds.js";
 
 const colorIds = ["green", "red", "yellow", "blue"];
 const startNumber = 4;
@@ -30,7 +31,6 @@ function App() {
   const [timerInterval, setTimerInterval] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
-  const [animateShake, setAnimateShake] = useState(false);
 
   const colors = [
     // Four basic Simon Says colors, could look for some way to let user change colors themselves, soonTM
@@ -176,13 +176,18 @@ function App() {
 
     const currentIndex = playerOrder.length - 1;
 
+    // Resets playerOrder on wrong input
     if (playerOrder[currentIndex] !== order[currentIndex]) {
-      // Resets playerOrder on wrong input
+      // Just for fun :)
+      const badLuck = Math.floor(Math.random() * 100 + 1);
+      if (badLuck > 95) {
+        playSound("loud-buzzer");
+      } else {
+        playSound("error");
+      }
       setShowError(true);
-      setAnimateShake(true);
       setTimeout(() => {
         setShowError(false);
-        setAnimateShake(false);
         setPlayerOrder([]);
       }, 600);
       return;
@@ -190,11 +195,10 @@ function App() {
 
     if (playerOrder.length === order.length) {
       setShowSuccess(true);
-      setAnimateShake(true);
+      playSound("correct");
       // Delay between rounds
       setTimeout(() => {
         setShowSuccess(false);
-        setAnimateShake(false);
 
         // Add a new color
         const newColor = colorIds[Math.floor(Math.random() * colorIds.length)];
@@ -255,7 +259,7 @@ function App() {
               ${
                 isFlashing
                   ? "opacity-50 cursor-not-allowed"
-                  : "cursor-pointer hover:brightness-110 hover:ring-1 hover:ring-white/40 active:brightness-50 active:scale-98"
+                  : "cursor-pointer hover:brightness-110 active:brightness-50 active:scale-98"
               }
               `}
             disabled={isFlashing}
