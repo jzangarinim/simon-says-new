@@ -9,6 +9,7 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [activeColor, setActiveColor] = useState(null);
   const [flashDuration, setFlashDuration] = useState(600); // Sets the flash duration for colors at 600 ms initially (will update later)
+  const [isFlashing, setIsFlashing] = useState(false);
   const [countdown, setCountdown] = useState(null);
   const [playerOrder, setPlayerOrder] = useState([]);
   const [showRestartModal, setShowRestartModal] = useState(false);
@@ -37,10 +38,26 @@ function App() {
     },
   ];
 
+  const resetGame = () => {
+    // Reset everything after pressing restart
+    const newOrder = [];
+    for (let i = 0; i < startNumber; i++) {
+      const randomIndex = Math.floor(Math.random() * colorIds.length);
+      newOrder.push(colorIds[randomIndex]);
+    }
+    setOrder(newOrder);
+    setPlayerOrder([]);
+    setGameStarted(false);
+    setCountdown(null);
+    setShowRestartModal(false);
+  };
+
   useEffect(() => {
     // Color flashing
     if (order.length === 0) return; // Just in case
     if (!gameStarted) return;
+
+    setIsFlashing(true);
 
     order.forEach((color, index) => {
       setTimeout(() => {
@@ -48,6 +65,14 @@ function App() {
         setTimeout(() => setActiveColor(null), flashDuration); // Turns off after flashDuration
       }, index * flashDuration * 1.2); // 1.2 is a 20% increase to flashDuration, acting as a 20% buffer between colors based on duration
     });
+
+    // Calculate amount of time that buttons will be inactive due to flashing, plus a small buffer
+    const totalFlashTime = order.length * flashDuration * 1.2;
+    const buffer = 200;
+
+    setTimeout(() => {
+      setIsFlashing(false); //
+    }, totalFlashTime + buffer);
   }, [order, flashDuration, gameStarted]);
 
   useEffect(() => {
@@ -109,9 +134,13 @@ function App() {
               ${color.colorClass} 
               ${color.positionClass}
               ${activeColor === color.id ? "brightness-125 shadow-2xl" : ""}
+              ${isFlashing ? "opacity-50 cursor-not-allowed" : ""}
               `}
+            disabled={isFlashing}
             onClick={() => {
-              setPlayerOrder([...playerOrder, color.id]);
+              if (!isFlashing) {
+                setPlayerOrder([...playerOrder, color.id]);
+              }
             }}
           />
         ))}
@@ -124,7 +153,9 @@ function App() {
               bg-gray-800 border-white text-white cursor-pointer
               ${gameStarted || countdown !== null ? "visible" : "visible"}
               `}
+          disabled={isFlashing || countdown !== null}
           onClick={() => {
+            if (isFlashing || countdown !== null) return;
             if (gameStarted == false) {
               let count = 3;
               setCountdown(count);
@@ -143,11 +174,14 @@ function App() {
             }
           }}
         >
-          {`${gameStarted ? "II" : "Start"}`}
+          {countdown !== null ? "" : gameStarted ? "II" : "Start"}
         </button>
       </div>
       {showRestartModal && (
-        <RestartModal onClose={() => setShowRestartModal(false)} />
+        <RestartModal
+          onClose={() => setShowRestartModal(false)}
+          onRestart={resetGame}
+        />
       )}
     </>
   );

@@ -1,4 +1,4 @@
-export default function RestartModal({ onClose }) {
+export default function RestartModal({ onClose, onRestart }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-slate-900/75" aria-hidden="true" />
@@ -19,11 +19,7 @@ export default function RestartModal({ onClose }) {
           </button>
           <button
             className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
-            onClick={() => {
-              // Reset game logic
-              onClose(); // Hide modal
-              window.location.reload(); // Or reset your states manually
-            }}
+            onClick={onRestart}
           >
             Restart
           </button>
