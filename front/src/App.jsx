@@ -4,6 +4,8 @@ import Scoreboard from "./components/Scoreboard";
 import FlashLayer from "./components/FlashLayer";
 import { createRipple } from "./components/Ripple";
 import { playSound } from "./utils/sounds.js";
+import { Drawer, IconButton, Box, Slider } from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const colorIds = ["green", "red", "yellow", "blue"];
 const startNumber = 4;
@@ -31,6 +33,7 @@ function App() {
   const [timerInterval, setTimerInterval] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false); // Shows green layer on correct order input
   const [showError, setShowError] = useState(false); // Shows red layer on incorrect order input
+  const [drawerOpen, setDrawerOpen] = useState(false); // Shows red layer on incorrect order input
 
   const colors = [
     // Four basic Simon Says colors, could look for some way to let user change colors themselves, soonTM
@@ -55,6 +58,10 @@ function App() {
       positionClass: " bottom-0 right-0 rounded-br-full",
     },
   ];
+
+  function valuetext(value) {
+    return `${value} ms`;
+  }
 
   const resetGame = () => {
     // Reset everything after pressing restart
@@ -212,7 +219,52 @@ function App() {
 
   return (
     <div className="relative min-h-screen bg-gray-900 text-white flex flex-col items-center justify-start pt-8">
-      <h1 className="text-4xl font-bold mb-4">Simon Says</h1>
+      <Drawer
+        anchor="top"
+        open={drawerOpen}
+        onClose={() => {
+          setDrawerOpen(false);
+        }}
+        sx={{
+          "& .MuiDrawer-paper": {
+            bgcolor: "#111827", // tailwind gray-900
+            color: "#ffffff",
+            borderBottom: "1px solid #374151",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            pt: 5,
+            pb: 3, // padding so the slider doesn’t touch the edges
+          },
+        }}
+      >
+        <Box sx={{ width: "auto" }} className="flex-col items-center">
+          <Slider
+            sx={{ width: 300 }}
+            defaultValue={600}
+            aria-label="Game speed"
+            getAriaValueText={valuetext}
+            valueLabelDisplay="auto"
+            value={flashDuration}
+            onChange={(_, v) => setFlashDuration(v)}
+            step={100}
+            min={100}
+            max={900}
+            marks
+          />
+        </Box>
+      </Drawer>
+      <div className="flex">
+        <h1 className="text-4xl font-bold mb-4 pr-3">Simon Says</h1>
+        <IconButton
+          color="success"
+          onClick={() => {
+            setDrawerOpen(true);
+          }}
+        >
+          <SettingsIcon />
+        </IconButton>
+      </div>
       <Scoreboard
         score={score}
         highScore={highScore}
@@ -281,7 +333,8 @@ function App() {
           onClick={() => {
             if (isFlashing || countdown !== null) return;
             if (gameStarted == false) {
-              let count = 1;
+              playSound("countdown");
+              let count = 3;
               setCountdown(count);
               const countdownInterval = setInterval(() => {
                 count -= 1;

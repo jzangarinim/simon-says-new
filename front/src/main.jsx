@@ -4,7 +4,7 @@ import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <div className="flex-col items-center justify-center h-screen bg-slate-900 pt-12">
+    <div className="h-screen overflow-hidden bg-slate-900">
       <App />
     </div>
   </StrictMode>
