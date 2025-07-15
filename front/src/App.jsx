@@ -11,10 +11,11 @@ const colorIds = ["green", "red", "yellow", "blue"];
 const startNumber = 4;
 
 function App() {
+  const [mount, setMount] = useState(false);
   const [order, setOrder] = useState([]); // Color order
   const [gameStarted, setGameStarted] = useState(false); // Game started state
   const [activeColor, setActiveColor] = useState(null); // Currently flashing color
-  const [flashDuration, setFlashDuration] = useState(600); // Sets the flash duration for colors at 600 ms initially (will update later)
+  const [flashDuration, setFlashDuration] = useState(600); // Sets the flash duration for colors at 600 ms initially
   const [isFlashing, setIsFlashing] = useState(false); // Color flashing state to disable inputs
   const [countdown, setCountdown] = useState(null); // Initial countdown upon pressing Start
   const [playerOrder, setPlayerOrder] = useState([]); // Stores the player's color inputs to compare with order
@@ -175,6 +176,7 @@ function App() {
       setOrder(newOrder);
     };
     generateInitialOrder();
+    setMount(true);
   }, []);
 
   // Player input comparison vs initial order useEffect
@@ -240,22 +242,35 @@ function App() {
       >
         <Box sx={{ width: "auto" }} className="flex-col items-center">
           <Slider
-            sx={{ width: 300 }}
+            sx={{
+              width: 300,
+              "& .MuiSlider-markLabel": {
+                color: "#fff", // white text for slider labels
+              },
+            }}
             defaultValue={600}
             aria-label="Game speed"
             getAriaValueText={valuetext}
             valueLabelDisplay="auto"
             value={flashDuration}
-            onChange={(_, v) => setFlashDuration(v)}
+            onChange={(_, v) => {
+              setFlashDuration(v);
+              if (gameStarted) {
+                resetGame();
+              }
+            }}
             step={100}
-            min={100}
+            min={200}
             max={900}
-            marks
+            marks={[
+              { value: 200, label: "200 ms" },
+              { value: 900, label: "900 ms" },
+            ]}
           />
         </Box>
       </Drawer>
       <div className="flex">
-        <h1 className="text-4xl font-bold mb-4 pr-3">Simon Says</h1>
+        <h1 className="text-4xl font-bold mb-4">Simon Says</h1>
         <IconButton
           color="success"
           onClick={() => {
@@ -274,6 +289,7 @@ function App() {
         reactionHighScore={reactionHighScore}
       />
       <div className={`relative w-96 h-96 mx-auto`}>
+        {/* Color flash on right or wrong user input */}
         {(showError || showSuccess) && (
           <FlashLayer
             color={showError ? "rgba(220,38,38,0.4)" : "rgba(34,197,94,0.4)"}
@@ -297,17 +313,22 @@ function App() {
           </div>
         )}
 
-        {colors.map((color) => (
+        {colors.map((color, idx) => (
           // Color buttons
           <button
             key={color.id}
+            style={{
+              transitionDelay: `${idx * 120}ms`,
+              transformOrigin: "50% 50%",
+            }}
             className={`absolute z-10 w-1/2 h-1/2 
               shadow-gray-100/50 inset-shadow-white-100/50
               border-3 border-black
-              transition-all duration-200 
+              transition-all duration-500 ease-out
               ${color.colorClass} 
               ${color.positionClass}
               ${activeColor === color.id ? "glow-active" : ""}
+              ${mount ? "scale-100 opacity-100" : "scale-0 opacity-0"}
               ${
                 isFlashing
                   ? "opacity-50 cursor-not-allowed"
